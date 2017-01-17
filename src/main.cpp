@@ -78,30 +78,39 @@ void TPGLWindow::update()
 }
 
 //====================================================================================================================================
-void TPGLWindow::render()
+void TPGLWindow::buildShadowMap()
 {
-    // Specify winding order Counter ClockZise (even though it's default on OpenGL) ----------------
-    glFrontFace( GL_CCW );
+    // set front face culling
+    glCullFace( GL_FRONT );
 
-    // Enables (Back) Face Culling -----------------------------------------------------------------
-    glEnable( GL_CULL_FACE );
+    // Draws offscreen, into a FBO with only a Depth Texture attached ! -------------------------------
+    m_RenderTarget.bind();
+    {
+        // Specify the depth buffer clear color -------------------------------------------------------
+        glClearDepth( 1.f );
 
-    // Enables Depth Test --------------------------------------------------------------------------
-    glEnable( GL_DEPTH_TEST );
-    glDepthFunc( GL_LESS );
+        // Clears the framebuffer - depth buffer only -------------------------------------------------
+        glClear( GL_DEPTH_BUFFER_BIT );
 
-    // Enables Depth Write -------------------------------------------------------------------------
-    glDepthMask( GL_TRUE );
+        // Starts using the given GPU Program ---------------------------------------------------------
+        m_GPUProgramShadowMap.bind();
+        {
+            // Sends the uniforms var from the CPU to the GPU -----------------------------------------
+            m_paramsShadowMap.sendDataToGPU( m_mtxCharacterWorld, m_mtxLightProjView );
 
-    // Disables Alpha Blending ----------------------------------------------------------------------
-    glDisable( GL_BLEND );
+             // m_MeshGround.draw();
+            m_MeshCharacter.draw();
 
+        }
+        // Stops using the GPU Program ----------------------------------------------------------------
+        m_GPUProgramShadowMap.unbind();
+    }
+    m_RenderTarget.unbind();
+}
 
-    // ------------------------------------------------------------------------------------------------
-    // Builds the shadow map - should be called only when necessary to avoid wasting perf !
-    buildShadowMap();
-
-    // ------------------------------------------------------------------------------------------------
+//====================================================================================================================================
+void TPGLWindow::renderShadowedScene()
+{
     // Draws onscreen, into the default FrameBuffer ---------------------------------------------------
 
     // Specifies the viewport size -----------------------------------------------------------------
@@ -118,41 +127,71 @@ void TPGLWindow::render()
     glCullFace( GL_BACK );
 
     // Starts using the given GPU Program ---------------------------------------------------------
-    m_GPUProgramPhongTextured.bind();
+    // Render in HARDWARE FRAMEBUFFER - start !
     {
-        // Setup the Texture to be used in unit 1 - shadow
-        setupTexturesInUnit( m_RenderTarget.getTextureDepth(), 1 );
-
-        // Sends the uniforms var related to the scene from the CPU to the GPU --------------------
-        m_paramsPhongTextured.sendSceneDataToGPU( m_mtxCameraProjView, m_lightProp, m_materialProp
-                                                      , m_vCameraPosition, m_vLightPosition, m_mtxLightProjView );
-
-
-        // MARCUS
+        m_GPUProgramPhongTextured.bind();
         {
-            // Setup the Texture to be used in unit 0 - diffuse
-            setupTexturesInUnit( m_textureCharacter.getID(), 0 );
+            // Setup the Texture to be used in unit 1 - shadow
+            setupTexturesInUnit( m_RenderTarget.getTextureDepth(), 1 );
 
-            // Sends the uniforms var related to Marcus from the CPU to the GPU -----------------------
-            m_paramsPhongTextured.sendModelDataToGPU( m_mtxCharacterWorld );
+            // Sends the uniforms var related to the scene from the CPU to the GPU --------------------
+            m_paramsPhongTextured.sendSceneDataToGPU( m_mtxCameraProjView, m_lightProp, m_materialProp
+                                                          , m_vCameraPosition, m_vLightPosition, m_mtxLightProjView );
 
-            m_MeshCharacter.draw();
+
+            // MARCUS
+            {
+                // Setup the Texture to be used in unit 0 - diffuse
+                setupTexturesInUnit( m_textureCharacter.getID(), 0 );
+
+                // Sends the uniforms var related to Marcus from the CPU to the GPU -----------------------
+                m_paramsPhongTextured.sendModelDataToGPU( m_mtxCharacterWorld );
+
+                m_MeshCharacter.draw();
+            }
+
+            // GROUND
+            {
+                // Setup the Texture to be used in unit 0 - diffuse
+                setupTexturesInUnit( m_textureGround.getID(), 0 );
+
+                // Sends the uniforms var related to the ground from the CPU to the GPU -------------------
+                m_paramsPhongTextured.sendModelDataToGPU( m_mtxGroundWorld );
+
+                m_MeshGround.draw();
+            }
+
         }
-
-        // GROUND
-        {
-            // Setup the Texture to be used in unit 0 - diffuse
-            setupTexturesInUnit( m_textureGround.getID(), 0 );
-
-            // Sends the uniforms var related to the ground from the CPU to the GPU -------------------
-            m_paramsPhongTextured.sendModelDataToGPU( m_mtxGroundWorld );
-
-            m_MeshGround.draw();
-        }
-
+        // Stops using the GPU Program ----------------------------------------------------------------
+        m_GPUProgramPhongTextured.unbind();
     }
-    // Stops using the GPU Program ----------------------------------------------------------------
-    m_GPUProgramPhongTextured.unbind();
+    // Render in HARDWARE FRAMEBUFFER - end !
+}
+
+//====================================================================================================================================
+void TPGLWindow::render()
+{
+    // Enables (Back) Face Culling -----------------------------------------------------------------
+    glEnable( GL_CULL_FACE );
+
+    // Enables Depth Test --------------------------------------------------------------------------
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
+
+    // Enables Depth Write -------------------------------------------------------------------------
+    glDepthMask( GL_TRUE );
+
+    // Disables Alpha Blending ----------------------------------------------------------------------
+    glDisable( GL_BLEND );
+
+
+    // ------------------------------------------------------------------------------------------------
+    // Pass 0 : Builds the shadow map - should be called only when necessary to avoid wasting perf !
+    buildShadowMap();
+
+    // ------------------------------------------------------------------------------------------------
+    // Pass 1 : Renders the scene using the previously built shadow map
+    renderShadowedScene();
 }
 
 //====================================================================================================================================
@@ -328,38 +367,6 @@ void TPGLWindow::destroyGPUPrograms()
 
     m_GPUProgramPhongTextured.destroy();
 }
-
-//====================================================================================================================================
-void TPGLWindow::buildShadowMap()
-{
-    // set front face culling
-    glCullFace( GL_FRONT );
-
-    // Draws offscreen, into a FBO with only a Depth Texture attached ! -------------------------------
-    m_RenderTarget.bind();
-    {
-        // Specify the depth buffer clear color -------------------------------------------------------
-        glClearDepth( 1.f );
-
-        // Clears the framebuffer - depth buffer only -------------------------------------------------
-        glClear( GL_DEPTH_BUFFER_BIT );
-
-        // Starts using the given GPU Program ---------------------------------------------------------
-        m_GPUProgramShadowMap.bind();
-        {
-            // Sends the uniforms var from the CPU to the GPU -----------------------------------------
-            m_paramsShadowMap.sendDataToGPU( m_mtxCharacterWorld, m_mtxLightProjView );
-
-            // m_MeshGround.draw();
-            m_MeshCharacter.draw();
-
-        }
-        // Stops using the GPU Program ----------------------------------------------------------------
-        m_GPUProgramShadowMap.unbind();
-    }
-    m_RenderTarget.unbind();
-}
-
 
 //====================================================================================================================================
 int main(int argc, char **argv)

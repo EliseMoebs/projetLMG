@@ -80,8 +80,8 @@ private:
     /// Builds the shadow map
     void buildShadowMap();
 
-    /// Sends the Shadow Map building related uniform vars from the CPU to the GPU
-    void sendShadowMapBuildingUniformsToGPU();
+    /// Renders the scene with shadows
+    void renderShadowedScene();
 
 
     static const float      s_fCameraZInit;

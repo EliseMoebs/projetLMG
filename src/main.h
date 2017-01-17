@@ -80,8 +80,8 @@ private:
     /// Builds the shadow map
     void buildShadowMap();
 
-    /// Renders the scene with shadows
-    void renderShadowedScene();
+    /// Sends the Shadow Map building related uniform vars from the CPU to the GPU
+    void sendShadowMapBuildingUniformsToGPU();
 
 
     static const float      s_fCameraZInit;
@@ -106,6 +106,7 @@ private:
 
     Mesh                    m_MeshGround;                       ///< Mesh used for Marcus
     Mesh                    m_MeshCharacter;                    ///< Mesh used for the ground
+    Mesh                    m_MeshScreen;                       ///< Mesh used to blit the color texture onto the screen
 
     Texture                 m_textureCharacter;                 ///< Texture used for diffuse texture of Marcus
     Texture                 m_textureGround;                    ///< Texture used for diffuse texture of the ground

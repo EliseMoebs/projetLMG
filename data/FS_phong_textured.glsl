@@ -78,9 +78,6 @@ float computeShadowFactor()
 {
     ivec2 vTexSize = textureSize( u_texShadow, 0 );
 
-// uncomment to get basic version
-//    return texture( u_texShadow, vs_texCoordsShadow.xyz );
-
     vec2 vOffset = 1.0f / vTexSize;
 
     vOffset *= 4; // take a samples further away !

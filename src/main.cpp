@@ -16,6 +16,7 @@ TPGLWindow::TPGLWindow()
     , m_paramsSSAO             ()
     , m_textureCharacter            ()
     , m_textureGround               ()
+    , m_textureNoise                ()
     , m_bAlphaBlend                 ( false )
     , m_RenderTarget                ()
     , m_GPUProgramSceneMap     ()
@@ -56,7 +57,7 @@ void TPGLWindow::initialize()
 
     createGPUPrograms();
 
-    m_RenderTarget.create( 2048, 2048, GL_RGB, GL_DEPTH_COMPONENT );
+    m_RenderTarget.create( this->width(), this->height(), GL_RGB, GL_DEPTH_COMPONENT );
 
 }
 
@@ -83,6 +84,9 @@ void TPGLWindow::render()
 {
     // Specify winding order Counter ClockZise (even though it's default on OpenGL) ----------------
     glFrontFace( GL_CCW );
+
+    // set back face culling
+    glCullFace( GL_BACK );
 
     // Enables (Back) Face Culling -----------------------------------------------------------------
     glEnable( GL_CULL_FACE );
@@ -115,14 +119,16 @@ void TPGLWindow::render()
     // Clears the framebuffer ---------------------------------------------------------------------
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
-    // set back face culling
-    glCullFace( GL_BACK );
 
     // Starts using the given GPU Program ---------------------------------------------------------
     m_GPUProgramSSAO.bind();
     {
         setupTexturesInUnit(m_RenderTarget.getTextureColor0(),0);
+        setupTexturesInUnit(m_textureNoise.getID(),1);
+        setupTexturesInUnit(m_RenderTarget.getTextureDepth(),2);
+
         m_paramsSSAO.sendDataToGPU();
+
         m_MeshScreen.draw();
 
         /*
@@ -168,8 +174,8 @@ void TPGLWindow::resizeEvent(QResizeEvent* /*_pEvent*/)
     {
         m_RenderTarget.destroy();
 
-        m_RenderTarget.create( 2048, 2048, 0, GL_DEPTH_COMPONENT );
-    }
+        m_RenderTarget.create( this->width(), this->height(), GL_RGB, GL_DEPTH_COMPONENT );
+     }
 
     // Force the update of the perspective matrix
     updateMatrices();
@@ -313,6 +319,7 @@ void TPGLWindow::createTextures()
 //    glEnable(GL_TEXTURE_2D);
     m_textureCharacter.createFrom( PATH_TO_DATA "/Marcus/Marcus_full_D.tga" );
     m_textureGround.createFrom( PATH_TO_DATA "/earth.png" );
+    m_textureNoise.createFrom( PATH_TO_DATA "/noise_texture.png");
 }
 
 //====================================================================================================================================
@@ -320,6 +327,7 @@ void TPGLWindow::destroyTextures()
 {
     m_textureCharacter.destroy();
     m_textureGround.destroy();
+    m_textureNoise.destroy();
 }
 
 //====================================================================================================================================
@@ -358,9 +366,6 @@ void TPGLWindow::destroyGPUPrograms()
 //====================================================================================================================================
 void TPGLWindow::buildSceneMap()
 {
-    // set front face culling
-    //glCullFace( GL_FRONT );
-
     // Draws offscreen, into a FBO with only a Depth Texture attached ! -------------------------------
     m_RenderTarget.bind();
     {

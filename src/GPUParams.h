@@ -122,7 +122,9 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
    // GLuint      			m_iUniformShadowMapProjView;        ///< GLSL uniform location for concatenanted ( Projection x View ) matrix
    // GLuint      			m_iUniformShadowMapWorld;           ///< GLSL uniform location for World matrix
 
-    GLuint                  m_iUniformSamplerBlit;
+    GLuint                  m_iUniformSamplerBlit;              ///<GLSL uniform location for the sampler "u_texBlit"
+    GLuint                  m_iUniformSamplerNoise;              ///<GLSL uniform location for the sampler "u_texNoise"
+    GLuint                  m_iUniformSamplerDepth;              ///<GLSL uniform location for the sampler "u_texDepth"
 
 
     /// Builds this parameter set from the given GPUProgram
@@ -137,6 +139,8 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
        // m_iUniformShadowMapProjView = rProgram.getUniformLocation( "u_mtxProjView" );
 
         m_iUniformSamplerBlit = rProgram.getUniformLocation( "u_texBlit" );
+        m_iUniformSamplerNoise = rProgram.getUniformLocation( "u_texNoise" );
+        m_iUniformSamplerDepth = rProgram.getUniformLocation( "u_texDepth" );
 
     }
 
@@ -147,6 +151,8 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
        // glUniformMatrix4fv( m_iUniformShadowMapProjView, 1, GL_FALSE, glm::value_ptr(_rmtxLightProjView) );
 
         glUniform1i(m_iUniformSamplerBlit,0);
+        glUniform1i(m_iUniformSamplerNoise,1);
+        glUniform1i(m_iUniformSamplerDepth,2);
 
     }
 };

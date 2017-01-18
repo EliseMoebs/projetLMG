@@ -107,6 +107,7 @@ private:
 
     Texture                 m_textureCharacter;                 ///< Texture used for diffuse texture of Marcus
     Texture                 m_textureGround;                    ///< Texture used for diffuse texture of the ground
+    Texture                 m_textureNoise;                     ///< Texture used for SSAO post-process
 
     //----------------------------------------------------------------------------------------------------------------
     glm::vec3               m_vCameraPosition;                  ///< Camera position - in World Space

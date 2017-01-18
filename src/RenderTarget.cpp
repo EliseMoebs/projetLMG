@@ -161,7 +161,7 @@ void RenderTarget::writeToFile( const std::string& _rstrFilePath )
 
 
     glBindFramebuffer( GL_FRAMEBUFFER, m_iFBO );
-    {        
+    {
         if( 0 != m_iAttachmentColor0 )
         {
             glReadPixels( 0, 0, m_iWidth, m_iHeight, GL_RGBA, GL_UNSIGNED_BYTE, aPixels );

@@ -19,7 +19,6 @@ out vec3 vs_vNormal;
 out vec3 vs_vToCamera;
 out vec3 vs_vToLight;
 out vec2 vs_texCoords;
-out vec4 vs_texCoordsShadow;
 
 
 const mat4 mtxBias  = mat4  ( vec4( 0.5f, 0.0f, 0.0f, 0.0f )
@@ -45,10 +44,6 @@ void main()
 
     // transfert vertex colour from this Shader Unit (Vertex) to the next Shader Unit - in our case Fragment
     vs_texCoords = vtx_texCoords;
-
-    //
-    vs_texCoordsShadow = mtxBias * u_mtxLightProjView * vWorldPosition;
-//    vs_texCoordsShadow = u_mtxLightProjView * vWorldPosition;
 
     gl_Position = u_mtxCameraProjView * vWorldPosition;
 }

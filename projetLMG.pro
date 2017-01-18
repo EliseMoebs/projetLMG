@@ -48,9 +48,9 @@ SOURCES +=  openglwindow.cpp \
     src/Texture.cpp
 
 DISTFILES += \
-    data/FS_shadowMap.glsl \
-    data/VS_shadowMap.glsl \
-    data/VS_phong_textured.glsl
+    data/VS_scene_map.glsl \
+    data/FS_SSAO.glsl \
+    data/VS_SSAO.glsl
 
 win32:LIBS      += -lopengl32
 

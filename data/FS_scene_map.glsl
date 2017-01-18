@@ -6,9 +6,6 @@ in vec3 vs_vNormal;
 in vec3 vs_vToCamera;
 in vec3 vs_vToLight;
 
-in vec4 vs_texCoordsShadow;
-uniform sampler2DShadow u_texShadow;
-
 uniform sampler2D u_texDiffuse;
 
 struct LightProperties
@@ -74,31 +71,6 @@ vec3 specularLightingPhong( in vec3 N, in vec3 L, in vec3 V )
 #define EPSILON         0.0001f
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float computeShadowFactor()
-{
-    ivec2 vTexSize = textureSize( u_texShadow, 0 );
-
-    vec2 vOffset = 1.0f / vTexSize;
-
-    vOffset *= 4; // take a samples further away !
-
-    float fFactor = 0.0;
-
-    for( int y = -1 ; y <= 1 ; y++ )
-    {
-        for( int x = -1 ; x <= 1 ; x++ )
-        {
-            vec2 Offsets = vec2( x * vOffset.x, y * vOffset.y );
-
-            vec3 vUVoff = vec3( vs_texCoordsShadow.xy + Offsets, vs_texCoordsShadow.z + EPSILON );
-            fFactor += texture( u_texShadow, vUVoff );
-        }
-    }
-
-    float fAverageShadowFactor = fFactor / 9.0;
-
-    return ( BASE_SHADOW + ( fAverageShadowFactor / ( 1.f - BASE_SHADOW ) ) );
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,20 +91,7 @@ void main(void)
     vec3 texColour = texture( u_texDiffuse, vec2( vs_texCoords.x, 1 - vs_texCoords.y) ).rgb;
 
 
-    float fShadow;
-
-    float fNdotL = dot( N, L );
-
-    if( fNdotL < 0.01f )
-    {
-        fShadow = BASE_SHADOW;
-    }
-    else
-    {
-        fShadow = computeShadowFactor();
-    }
-
-    out_fragColor.xyz = ( Iamb + Idif ) * texColour * fShadow + Ispe ;
+    out_fragColor.xyz = ( Iamb + Idif ) * texColour  + Ispe ;
 //    out_fragColor.xyz = vec3(fShadow);
 
     out_fragColor.a = 1;

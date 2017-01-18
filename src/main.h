@@ -78,10 +78,7 @@ private:
 
     //------------------------------------------------------------------------------------
     /// Builds the shadow map
-    void buildShadowMap();
-
-    /// Sends the Shadow Map building related uniform vars from the CPU to the GPU
-    void sendShadowMapBuildingUniformsToGPU();
+    void buildSceneMap();
 
 
     static const float      s_fCameraZInit;
@@ -95,11 +92,11 @@ private:
     RenderTarget            m_RenderTarget;                     ///< FBO with a Depth Texture that we will render into from the light POV, and use to get the shadowed area
 
     //----------------------------------------------------------------------------------------------------------------
-    GPUProgram              m_GPUProgramShadowMap;              ///<
-    GPUProgram              m_GPUProgramPhongTextured;          ///<
+    GPUProgram              m_GPUProgramSSAO;              ///<
+    GPUProgram              m_GPUProgramSceneMap;          ///<
 
-    GPUParamsPhongTextured  m_paramsPhongTextured;              ///<
-    GPUParamsShadowMap      m_paramsShadowMap;                  ///<
+    GPUParamsPhongTextured  m_paramsSceneMap;              ///<
+    GPUParamsSSAO      m_paramsSSAO;                  ///<
 
     //----------------------------------------------------------------------------------------------------------------
     MaterialProperties      m_materialProp;                     ///< Material properties

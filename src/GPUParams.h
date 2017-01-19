@@ -119,7 +119,7 @@ struct GPUParamsPhongTextured : protected QOpenGLFunctions_3_3_Core
 /// GPUProgram Parameters for the shadow map building shader program
 struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
 {
-   // GLuint      			m_iUniformShadowMapProjView;        ///< GLSL uniform location for concatenanted ( Projection x View ) matrix
+    GLuint      			m_iUniformProjViewInv;        ///< GLSL uniform location for concatenanted ( Projection x View ) matrix
    // GLuint      			m_iUniformShadowMapWorld;           ///< GLSL uniform location for World matrix
 
     GLuint                  m_iUniformSamplerBlit;              ///<GLSL uniform location for the sampler "u_texBlit"
@@ -137,7 +137,7 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
         GPUProgram& rProgram = const_cast< GPUProgram& >( _rProgram );
 
      //   m_iUniformShadowMapWorld    = rProgram.getUniformLocation( "u_mtxWorld" );
-       // m_iUniformShadowMapProjView = rProgram.getUniformLocation( "u_mtxProjView" );
+        m_iUniformProjViewInv = rProgram.getUniformLocation( "u_mtxProjViewInv" );
 
         m_iUniformSamplerBlit = rProgram.getUniformLocation( "u_texBlit" );
         m_iUniformSamplerNoise = rProgram.getUniformLocation( "u_texNoise" );
@@ -147,10 +147,10 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
     }
 
     /// Sends the uniforms var related to the model from the CPU to the GPU
-    void sendDataToGPU( /*const glm::mat4& _rmtxWorld, const glm::mat4& _rmtxLightProjView */)
+    void sendDataToGPU( /*const glm::mat4& _rmtxWorld,*/ const glm::mat4& _rmtxProjViewInv )
     {
         //glUniformMatrix4fv( m_iUniformShadowMapWorld, 1, GL_FALSE, glm::value_ptr(_rmtxWorld) );
-       // glUniformMatrix4fv( m_iUniformShadowMapProjView, 1, GL_FALSE, glm::value_ptr(_rmtxLightProjView) );
+        glUniformMatrix4fv( m_iUniformProjViewInv, 1, GL_FALSE, glm::value_ptr(_rmtxProjViewInv) );
 
         glUniform1i(m_iUniformSamplerBlit,0);
         glUniform1i(m_iUniformSamplerNoise,1);

@@ -3,7 +3,7 @@
 // get these data from the previous Shader Unit in the pipeline
 in vec2 vs_texCoords;
 in vec3 vs_vNormal;
-in vec3 vs_vNormalProj;
+in vec3 vs_vNormalView;
 
 in vec3 vs_vToCamera;
 in vec3 vs_vToLight;
@@ -102,6 +102,6 @@ void main(void)
 
 
 //    out_fragNormal = normalize(vs_vNormalProj);
-//    out_fragNormal = vs_vNormalProj;
-    out_fragNormal = N;
+    out_fragNormal = vs_vNormalView;
+//    out_fragNormal = N;
 }

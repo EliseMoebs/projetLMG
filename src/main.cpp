@@ -128,7 +128,10 @@ void TPGLWindow::render()
         setupTexturesInUnit(m_RenderTarget.getTextureDepth(),2);
         setupTexturesInUnit(m_RenderTarget.getTextureColor1(),3);
 
-        m_paramsSSAO.sendDataToGPU();
+        glm::mat4 inv;
+        inv = glm::inverse(m_mtxCameraProjView);
+
+        m_paramsSSAO.sendDataToGPU(inv);
 
         m_MeshScreen.draw();
 

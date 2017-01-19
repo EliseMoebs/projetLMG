@@ -170,6 +170,7 @@ uniform sampler2D u_texNoise;
 uniform sampler2D u_texDepth;
 uniform sampler2D u_texNormal;
 
+uniform mat4 u_mtxProjViewInv;
 
 // we should use this, instead of gl_FragColor which is deprecated since GL version 3.0
 out vec4 out_fragColor;
@@ -177,10 +178,28 @@ float g_scale;
 float g_bias;
 float g_intensity;
 
+vec3 WSPositionFromDepth(vec2 vTexCoord)
+{
+    // Get the depth value for this pixel
+    float z = texture2D(u_texDepth, vTexCoord).r;
+    // Get x/w and y/w from the viewport position
+    float x = vTexCoord.x * 2 - 1;
+    float y = vTexCoord.y * 2 - 1;
+    vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+    // Transform by the inverse projection matrix
+    vec4 vPositionWS =  u_mtxProjViewInv*vProjectedPos;
+    // Divide by w to get the view-space position
+    return vPositionWS.xyz;
+
+//    vec4 vPositionVS =  u_mtxProjViewInv*vProjectedPos;
+//    // Divide by w to get the view-space position
+//    return vPositionVS.xyz / vPositionVS.w;
+
+}
+
 float doAmbientOcclusion( vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm)
 {
-    float depth = texture2D(u_texDepth, tcoord+uv).r;
-    vec3 diff = vec3(tcoord+uv,depth) - p ;//* 2.0f - vec3(1.0f);
+    vec3 diff = WSPositionFromDepth(tcoord+uv) - p ;//* 2.0f - vec3(1.0f);
 
     //vec3 diff = getPosition(tcoord + uv) - p;
 //    vec3 diff = vec3(tcoord+uv,p[2]) - p;
@@ -195,15 +214,16 @@ void main()
     //https://mynameismjp.wordpress.com/2009/03/10/reconstructing-position-from-depth/
 
 
-    g_scale = 0.01;
-    g_bias = 0.000001;
-    g_intensity = 1;
+    g_scale = 1.5;
+    g_bias = 0.0015;
+    g_intensity = 3;
     const vec2 vec[4] = vec2[](vec2(1,0),vec2(-1,0),
                             vec2(0,1),vec2(0,-1));
     float depth = texture2D(u_texDepth, vs_texCoords).r;
     vec2 rand = normalize(texture2D(u_texNoise, vs_texCoords).rg * 2.0f - 1.0f );
-    vec3 p = vec3( vs_texCoords.x * 2.0f - 1.0f, vs_texCoords.y * 2.0f - 1.0f, depth );
-    vec3 n = normalize(texture2D(u_texNormal,vs_texCoords).xyz);// * 2.0f - 1.0f;
+    //vec3 p = vec3( vs_texCoords.x * 2.0f - 1.0f, vs_texCoords.y * 2.0f - 1.0f, depth );
+    vec3 p = WSPositionFromDepth(vs_texCoords);
+    vec3 n = normalize(texture2D(u_texNormal,vs_texCoords).xyz * 2.0f - 1.0f);
     /*
     float3 p = getPosition(i.uv);
     float3 n = getNormal(i.uv);

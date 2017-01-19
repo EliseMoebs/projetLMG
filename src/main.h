@@ -112,6 +112,8 @@ private:
     //----------------------------------------------------------------------------------------------------------------
     glm::vec3               m_vCameraPosition;                  ///< Camera position - in World Space
     glm::mat4   			m_mtxCameraProjView;                ///< Matrix transform, for camera  world -> view -> projection coordinates
+    glm::mat4               m_mtxCameraView;
+    glm::mat4               m_mtxCameraProj;
 
 
     //----------------------------------------------------------------------------------------------------------------

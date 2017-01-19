@@ -123,6 +123,8 @@ bool Mesh::createFrom( GLenum _eDrawMode, GLuint _iVertexCount, glm::vec3* _afPo
     }
     // UnBinds the VAO, we are done working on it !
     glBindVertexArray( 0 );
+
+    return true;
 }
 //====================================================================================================================================
 void Mesh::destroy()

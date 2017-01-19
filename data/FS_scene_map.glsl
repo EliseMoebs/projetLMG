@@ -102,6 +102,6 @@ void main(void)
 
 
 //    out_fragNormal = normalize(vs_vNormalProj);
-    out_fragNormal = vs_vNormalView;
+    out_fragNormal = normalize(vs_vNormalView);
 //    out_fragNormal = N;
 }

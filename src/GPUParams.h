@@ -46,6 +46,7 @@ struct GPUParamsPhongTextured : protected QOpenGLFunctions_3_3_Core
     GLuint                  m_aiUniformMaterialProp[4];         ///< GLSL uniform location for each material property
     GLuint                  m_iUniformCameraPosition;           ///< GLSL uniform location for camera position
     GLuint                  m_iUniformCameraProjView;           ///< GLSL uniform location for concatenanted camera ( Projection x View   ) matrix
+    GLuint                  m_iUniformCameraView;               ///< GLSL uniform location for View matrix
     GLuint      			m_iUniformWorld;                    ///< GLSL uniform location for a World matrix
     GLuint                  m_iUniformSampler;                  ///< GLSL uniform location for the sampler "u_texDiffuse"
     GLuint                  m_iUniformSampler2;                 ///< GLSL uniform location for the sampler "u_texShadow"
@@ -75,6 +76,7 @@ struct GPUParamsPhongTextured : protected QOpenGLFunctions_3_3_Core
         m_iUniformWorld             = rProgram.getUniformLocation( "u_mtxWorld" );
         m_iUniformCameraProjView    = rProgram.getUniformLocation( "u_mtxCameraProjView" );
         m_iUniformLightProjView     = rProgram.getUniformLocation( "u_mtxLightProjView" );
+        m_iUniformCameraView        = rProgram.getUniformLocation( "u_mtxCameraView");
 
         // Retrieves the uniform location for the texture SAMPLER used in the GLSL Fragment Shader
         m_iUniformSampler           = rProgram.getUniformLocation( "u_texDiffuse" );
@@ -137,7 +139,7 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
         GPUProgram& rProgram = const_cast< GPUProgram& >( _rProgram );
 
      //   m_iUniformShadowMapWorld    = rProgram.getUniformLocation( "u_mtxWorld" );
-        m_iUniformProjViewInv = rProgram.getUniformLocation( "u_mtxProjViewInv" );
+        m_iUniformProjViewInv = rProgram.getUniformLocation( "u_mtxProjInv" );
 
         m_iUniformSamplerBlit = rProgram.getUniformLocation( "u_texBlit" );
         m_iUniformSamplerNoise = rProgram.getUniformLocation( "u_texNoise" );

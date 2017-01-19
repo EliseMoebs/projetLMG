@@ -12,6 +12,8 @@ TPGLWindow::TPGLWindow()
     , m_mtxGroundWorld              (0)
     , m_mtxLightProjView            (0)
     , m_mtxCameraProjView           (0)
+    , m_mtxCameraView               (0)
+    , m_mtxCameraProj               (0)
     , m_paramsSceneMap         ()
     , m_paramsSSAO             ()
     , m_textureCharacter            ()
@@ -129,9 +131,9 @@ void TPGLWindow::render()
         setupTexturesInUnit(m_RenderTarget.getTextureColor1(),3);
 
         glm::mat4 inv;
-        inv = glm::inverse(m_mtxCameraProjView);
+        inv = glm::inverse(m_mtxCameraProj);
 
-        m_paramsSSAO.sendDataToGPU(inv);
+        m_paramsSSAO.sendDataToGPU(m_mtxCameraProj);
 
         m_MeshScreen.draw();
 
@@ -202,6 +204,8 @@ void TPGLWindow::updateMatrices()
         glm::mat4 mtxCameraView     = glm::lookAtRH( m_vCameraPosition, vCenter, vUp );
 //        glm::mat4 mtxCameraView     = glm::lookAtRH( m_vCameraPosition, m_vCameraPosition + vFront, vUp );
 
+        m_mtxCameraView             = mtxCameraView;
+        m_mtxCameraProj = glm::inverse( mtxCameraProjection);
         m_mtxCameraProjView         = mtxCameraProjection * mtxCameraView;
     }
 

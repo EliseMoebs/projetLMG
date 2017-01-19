@@ -170,7 +170,7 @@ uniform sampler2D u_texNoise;
 uniform sampler2D u_texDepth;
 uniform sampler2D u_texNormal;
 
-uniform mat4 u_mtxProjViewInv;
+uniform mat4 u_mtxProjInv;
 
 // we should use this, instead of gl_FragColor which is deprecated since GL version 3.0
 out vec4 out_fragColor;
@@ -187,13 +187,12 @@ vec3 WSPositionFromDepth(vec2 vTexCoord)
     float y = vTexCoord.y * 2 - 1;
     vec4 vProjectedPos = vec4(x, y, z, 1.0f);
     // Transform by the inverse projection matrix
-    vec4 vPositionWS =  u_mtxProjViewInv*vProjectedPos;
+    vec4 vPositionVS =  u_mtxProjInv*vProjectedPos;
     // Divide by w to get the view-space position
-    return vPositionWS.xyz;
+    //return vPositionWS.xyz;
 
-//    vec4 vPositionVS =  u_mtxProjViewInv*vProjectedPos;
-//    // Divide by w to get the view-space position
-//    return vPositionVS.xyz / vPositionVS.w;
+    // Divide by w to get the view-space position
+    return vPositionVS.xyz / vPositionVS.w;
 
 }
 

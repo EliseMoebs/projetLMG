@@ -108,6 +108,8 @@ bool GPUProgram::createFromFiles( const std::string& _rstrVertexShaderPath, cons
     ASSERT( 0 == m_iGPUGeometryShaderID ,    "m_iGPUGeometryShaderID should be 0 (here it is '%d')   - Was destroyShader() called on this one ?.\n", m_iGPUGeometryShaderID );
     ASSERT( 0 == m_iGPUFragmentShaderID ,    "m_iGPUFragmentShaderID should be 0 (here it is '%d')   - Was destroyShader() called on this one ?.\n", m_iGPUFragmentShaderID );
     //--------------------------------------------------------------------------------------------------------------------
+
+    return true;
 }
 //====================================================================================================================================
 void GPUProgram::destroy()

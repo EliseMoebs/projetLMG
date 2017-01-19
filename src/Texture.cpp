@@ -47,6 +47,8 @@ bool Texture::createFrom( const char* _strFilepath, GLint _iMinFilter, GLint _iM
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, img0.width(), img0.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, pDataImage0 );
     }
     glBindTexture( GL_TEXTURE_2D, 0 );
+
+    return true;
 }
 
 //====================================================================================================================================

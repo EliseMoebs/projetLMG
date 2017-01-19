@@ -86,10 +86,11 @@ void main()
         out_fragColor = vec4(final,final,final,1);
 }
 
-
+*/
 
 
 // get these data from the previous Shader Unit in the pipeline
+/*
 in vec2 vs_texCoords;
 
 uniform sampler2D u_texBlit;
@@ -159,9 +160,9 @@ void main()
     out_fragColor = vec4(fAverageAmbiantOcclusion);
 
 
-}
-//*/
-
+}*/
+//
+/*
 // get these data from the previous Shader Unit in the pipeline
 in vec2 vs_texCoords;
 
@@ -223,15 +224,15 @@ void main()
     //vec3 p = vec3( vs_texCoords.x * 2.0f - 1.0f, vs_texCoords.y * 2.0f - 1.0f, depth );
     vec3 p = WSPositionFromDepth(vs_texCoords);
     vec3 n = normalize(texture2D(u_texNormal,vs_texCoords).xyz * 2.0f - 1.0f);
-    /*
-    float3 p = getPosition(i.uv);
-    float3 n = getNormal(i.uv);
-    float2 rand = getRandom(i.uv);
-    */
+
+//    float3 p = getPosition(i.uv);
+//    float3 n = getNormal(i.uv);
+//    float2 rand = getRandom(i.uv);
+
     float ao = 0.0f;
     float rad = 0.0002/depth;
 
-    //**SSAO Calculation**//
+    //**SSAO Calculation**
     int iterations = 4;
     for (int j = 0; j < iterations; ++j)
     {
@@ -246,4 +247,47 @@ void main()
     }
     ao/=iterations*4.0;
     out_fragColor = vec4(1-ao);
+}
+
+*/
+
+// get these data from the previous Shader Unit in the pipeline
+in vec2 vs_texCoords;
+
+uniform sampler2D u_texBlit;
+uniform sampler2D u_texNoise;
+uniform sampler2D u_texDepth;
+uniform sampler2D u_texNormal;
+
+out vec4 color;
+
+void main()
+{
+   vec4 sum = vec4(0);
+   vec2 texcoord = vs_texCoords;//vec2(gl_TexCoord[0]);
+   int j;
+   int i;
+
+   for( i= -4 ;i < 4; i++)
+   {
+        for (j = -3; j < 3; j++)
+        {
+            sum += texture2D(u_texBlit, texcoord + vec2(j, i)*0.0004) * 0.25;
+        }
+   }
+       if (texture2D(u_texBlit, texcoord).r < 0.2)
+    {
+       color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
+    }
+    else
+    {
+        if (texture2D(u_texBlit, texcoord).r < 0.5)
+        {
+            color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
+        }
+        else
+        {
+            color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
+        }
+    }
 }

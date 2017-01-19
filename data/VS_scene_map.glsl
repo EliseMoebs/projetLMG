@@ -16,6 +16,7 @@ layout (location=2) in vec2 vtx_texCoords;
 
 // transfer these data to the Fragment Shader !
 out vec3 vs_vNormal;
+out vec3 vs_vNormalProj;
 out vec3 vs_vToCamera;
 out vec3 vs_vToLight;
 out vec2 vs_texCoords;
@@ -35,7 +36,7 @@ void main()
     // normal in world space
 //    vs_vNormal	= ( u_mtxNormal * vec4( vtx_normal, 1.0f ) ).xyz;
     vs_vNormal	= mat3( u_mtxWorld ) * vtx_normal;
-
+    vs_vNormalProj = vec3(u_mtxCameraProjView *vec4(vs_vNormal,1));
     // direction to camera
     vs_vToCamera= u_vCameraPositionWS.xyz - vWorldPosition.xyz;
 

@@ -8,6 +8,7 @@ RenderTarget::RenderTarget()
     ,   m_iHeight           ( 0 )
     ,   m_iFBO              ( 0 )
     ,   m_iAttachmentColor0 ( 0 )
+    ,   m_iAttachmentColor1 ( 0 )
     ,   m_iAttachmentDepth  ( 0 )
 {}
 //====================================================================================================================================
@@ -15,16 +16,18 @@ RenderTarget::~RenderTarget()
 {
     ASSERT( 0 == m_iFBO ,            "m_iFBO should be 0 (here it is '%d') - have you called destroy() ?.\n", m_iFBO );
     ASSERT( 0 == m_iAttachmentColor0,"m_iAttachmentColor0 should be 0 (here it is '%d') - have you called destroy() ?.\n", m_iAttachmentColor0 );
+    ASSERT( 0 == m_iAttachmentColor1,"m_iAttachmentColor1 should be 0 (here it is '%d') - have you called destroy() ?.\n", m_iAttachmentColor1 );
     ASSERT( 0 == m_iAttachmentDepth, "m_iAttachmentDepth should be 0 (here it is '%d') - have you called destroy() ?.\n", m_iAttachmentDepth );
 
 }
 //====================================================================================================================================
-bool RenderTarget::create( GLsizei _iWidth, GLsizei _iHeight, GLint _iColor0Format, GLint _iDepthFormat )
+bool RenderTarget::create( GLsizei _iWidth, GLsizei _iHeight, GLint _iColor0Format, GLint _iColor1Format, GLint _iDepthFormat )
 {
     //--------------------------------------------------------------------------------------------------------------------
     // precondition
     ASSERT( 0 == m_iFBO ,            "m_iFBO should be 0 (here it is '%d') - have you already called create() ?.\n", m_iFBO );
     ASSERT( 0 == m_iAttachmentColor0,"m_iAttachmentColor0 should be 0 (here it is '%d') - have you already called create() ?.\n", m_iAttachmentColor0 );
+    ASSERT( 0 == m_iAttachmentColor1,"m_iAttachmentColor1 should be 0 (here it is '%d') - have you already called create() ?.\n", m_iAttachmentColor1 );
     ASSERT( 0 == m_iAttachmentDepth, "m_iAttachmentDepth should be 0 (here it is '%d') - have you already called create() ?.\n", m_iAttachmentDepth );
     //--------------------------------------------------------------------------------------------------------------------
 
@@ -39,10 +42,11 @@ bool RenderTarget::create( GLsizei _iWidth, GLsizei _iHeight, GLint _iColor0Form
     glBindFramebuffer( GL_FRAMEBUFFER, m_iFBO );
     {
         int iDrawBuffersCount = 0;
-        GLenum aDrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+        GLenum aDrawBuffers[2];
 
         if( 0 != _iColor0Format )
         {
+            aDrawBuffers[ iDrawBuffersCount ] = GL_COLOR_ATTACHMENT0;
             iDrawBuffersCount++;
 
             // Creates the Texture Object that will be used as color buffer ------------------------------------------------------------
@@ -60,6 +64,28 @@ bool RenderTarget::create( GLsizei _iWidth, GLsizei _iHeight, GLint _iColor0Form
 
             // Set "m_iAttachmentColor0" as the color_buffer_0
             glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_iAttachmentColor0, 0 );
+        }
+
+        if( 0 != _iColor1Format )
+        {
+            aDrawBuffers[ iDrawBuffersCount ] = GL_COLOR_ATTACHMENT1;
+            iDrawBuffersCount++;
+
+            // Creates the Texture Object that will be used as color buffer ------------------------------------------------------------
+            glGenTextures( 1 , & m_iAttachmentColor1 );
+
+            // "Bind" the created texture : all future texture functions will modify this texture
+            glBindTexture( GL_TEXTURE_2D, m_iAttachmentColor1 );
+
+            // Put an empty image to OpenGL - see the last "0"
+            glTexImage2D( GL_TEXTURE_2D, 0, _iColor1Format, _iWidth, _iHeight, 0 , _iColor1Format, GL_UNSIGNED_BYTE, 0 );
+
+            // Required - but no need for a linear filtering
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+
+            // Set "m_iAttachmentColor0" as the color_buffer_1
+            glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_iAttachmentColor1, 0 );
         }
 
         if( 0 != _iDepthFormat )
@@ -121,6 +147,12 @@ void RenderTarget::destroy()
     }
 
 
+    if( 0 != m_iAttachmentColor1 )
+    {
+        glDeleteTextures( 1 , & m_iAttachmentColor1 );
+        m_iAttachmentColor1 = 0;
+    }
+
     if( 0 != m_iAttachmentColor0 )
     {
         glDeleteTextures( 1 , & m_iAttachmentColor0 );
@@ -161,7 +193,7 @@ void RenderTarget::writeToFile( const std::string& _rstrFilePath )
 
 
     glBindFramebuffer( GL_FRAMEBUFFER, m_iFBO );
-    {
+    {//todo : write for m_iAttachmentColor1
         if( 0 != m_iAttachmentColor0 )
         {
             glReadPixels( 0, 0, m_iWidth, m_iHeight, GL_RGBA, GL_UNSIGNED_BYTE, aPixels );

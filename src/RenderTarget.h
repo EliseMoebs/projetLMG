@@ -15,8 +15,8 @@ public:
     /// DTOR
     ~RenderTarget(); // not virtual - do not inherit this class !
 
-    /// Creates the RenderTarget and its internal data for COLOR_0 and DEPTH ( if _iColor0Format is 0 skips the COLOR_0, same for _iDepthFormat and DEPTH )
-    bool            create( GLsizei _iWidth, GLsizei _iHeight , GLint _iColor0Format = GL_RGB, GLint _iDepthFormat = GL_DEPTH_COMPONENT );
+    /// Creates the RenderTarget and its internal data for COLOR_0 COLOR_1 and DEPTH ( if _iColor0Format is 0 skips the COLOR_0, same for _iDepthFormat and DEPTH )
+    bool            create( GLsizei _iWidth, GLsizei _iHeight , GLint _iColor0Format = GL_RGB, GLint _iColor1Format = GL_RGB, GLint _iDepthFormat = GL_DEPTH_COMPONENT );
 
     /// Destroys the internal data
     void            destroy();
@@ -30,6 +30,9 @@ public:
     /// Returns the id of the Texture Object used as COLOR_O
     inline GLuint   getTextureColor0() const;
 
+    /// Returns the id of the Texture Object used as COLOR_1
+    inline GLuint   getTextureColor1() const;
+
     /// Returns the id of the Texture Object used as Depth
     inline GLuint   getTextureDepth() const;
 
@@ -38,12 +41,13 @@ public:
 
 private:
 
-    // NB : this will only allow us to use COLOR_0 and DEPTH
+    // NB : this will only allow us to use COLOR_0 COLOR_1 and DEPTH
 
     GLsizei                 m_iWidth;               ///<
     GLsizei                 m_iHeight;              ///<
     GLuint                  m_iFBO;                 ///< OpenGL ID for Frame Buffer Object
     GLuint                  m_iAttachmentColor0;    ///< OpenGL ID for Texture Object - used as Color Buffer on the FBO
+    GLuint                  m_iAttachmentColor1;    ///< OpenGL ID for Texture Object - used as Color Buffer on the FBO
     GLuint                  m_iAttachmentDepth;     ///< OpenGL ID for Render Buffer - used as Z Buffer on the FBO
 };
 
@@ -51,6 +55,11 @@ private:
 inline GLuint RenderTarget::getTextureColor0() const
 {
     return m_iAttachmentColor0;
+}
+//====================================================================================================================================
+inline GLuint RenderTarget::getTextureColor1() const
+{
+    return m_iAttachmentColor1;
 }
 //====================================================================================================================================
 inline GLuint RenderTarget::getTextureDepth() const

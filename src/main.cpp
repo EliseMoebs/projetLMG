@@ -57,7 +57,7 @@ void TPGLWindow::initialize()
 
     createGPUPrograms();
 
-    m_RenderTarget.create( this->width(), this->height(), GL_RGB, GL_DEPTH_COMPONENT );
+    m_RenderTarget.create( this->width(), this->height(), GL_RGB, GL_RGB, GL_DEPTH_COMPONENT );
 
 }
 
@@ -126,6 +126,7 @@ void TPGLWindow::render()
         setupTexturesInUnit(m_RenderTarget.getTextureColor0(),0);
         setupTexturesInUnit(m_textureNoise.getID(),1);
         setupTexturesInUnit(m_RenderTarget.getTextureDepth(),2);
+        setupTexturesInUnit(m_RenderTarget.getTextureColor1(),3);
 
         m_paramsSSAO.sendDataToGPU();
 
@@ -174,7 +175,7 @@ void TPGLWindow::resizeEvent(QResizeEvent* /*_pEvent*/)
     {
         m_RenderTarget.destroy();
 
-        m_RenderTarget.create( this->width(), this->height(), GL_RGB, GL_DEPTH_COMPONENT );
+        m_RenderTarget.create( this->width(), this->height(), GL_RGB, GL_RGB, GL_DEPTH_COMPONENT );
      }
 
     // Force the update of the perspective matrix

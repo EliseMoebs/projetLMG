@@ -123,8 +123,9 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
    // GLuint      			m_iUniformShadowMapWorld;           ///< GLSL uniform location for World matrix
 
     GLuint                  m_iUniformSamplerBlit;              ///<GLSL uniform location for the sampler "u_texBlit"
-    GLuint                  m_iUniformSamplerNoise;              ///<GLSL uniform location for the sampler "u_texNoise"
-    GLuint                  m_iUniformSamplerDepth;              ///<GLSL uniform location for the sampler "u_texDepth"
+    GLuint                  m_iUniformSamplerNoise;             ///<GLSL uniform location for the sampler "u_texNoise"
+    GLuint                  m_iUniformSamplerDepth;             ///<GLSL uniform location for the sampler "u_texDepth"
+    GLuint                  m_iUniformSamplerNormal;            ///<GLSL uniform location for the sampler "u_texNormal"
 
 
     /// Builds this parameter set from the given GPUProgram
@@ -141,6 +142,7 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
         m_iUniformSamplerBlit = rProgram.getUniformLocation( "u_texBlit" );
         m_iUniformSamplerNoise = rProgram.getUniformLocation( "u_texNoise" );
         m_iUniformSamplerDepth = rProgram.getUniformLocation( "u_texDepth" );
+        m_iUniformSamplerNormal = rProgram.getUniformLocation("u_texNormal");
 
     }
 
@@ -153,6 +155,7 @@ struct GPUParamsSSAO : protected QOpenGLFunctions_3_3_Core
         glUniform1i(m_iUniformSamplerBlit,0);
         glUniform1i(m_iUniformSamplerNoise,1);
         glUniform1i(m_iUniformSamplerDepth,2);
+        glUniform1i(m_iUniformSamplerNormal,3);
 
     }
 };

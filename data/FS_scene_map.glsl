@@ -3,6 +3,8 @@
 // get these data from the previous Shader Unit in the pipeline
 in vec2 vs_texCoords;
 in vec3 vs_vNormal;
+in vec3 vs_vNormalProj;
+
 in vec3 vs_vToCamera;
 in vec3 vs_vToLight;
 
@@ -26,7 +28,8 @@ struct MaterialProperties
 uniform MaterialProperties u_material;
 
 // we should use this, instead of gl_FragColor which is deprecated since GL version 3.0
-out vec4 out_fragColor;
+layout(location = 0) out vec4 out_fragColor;
+layout(location = 1) out vec3 out_fragNormal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // returns intensity of reflected ambient lighting
@@ -96,4 +99,9 @@ void main(void)
 //    out_fragColor.xyz = vec3(fShadow);
 
     out_fragColor.a = 1;
+
+
+//    out_fragNormal = normalize(vs_vNormalProj);
+//    out_fragNormal = vs_vNormalProj;
+    out_fragNormal = N;
 }

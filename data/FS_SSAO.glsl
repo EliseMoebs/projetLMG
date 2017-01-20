@@ -162,7 +162,7 @@ void main()
 
 }*/
 //
-/*
+
 // get these data from the previous Shader Unit in the pipeline
 in vec2 vs_texCoords;
 
@@ -199,6 +199,7 @@ vec3 WSPositionFromDepth(vec2 vTexCoord)
 
 float doAmbientOcclusion( vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm)
 {
+//    vec3 diff = WSPositionFromDepth(tcoord+uv) - p ;//* 2.0f - vec3(1.0f);
     vec3 diff = WSPositionFromDepth(tcoord+uv) - p ;//* 2.0f - vec3(1.0f);
 
     //vec3 diff = getPosition(tcoord + uv) - p;
@@ -214,15 +215,15 @@ void main()
     //https://mynameismjp.wordpress.com/2009/03/10/reconstructing-position-from-depth/
 
 
-    g_scale = 1.5;
-    g_bias = 0.0015;
-    g_intensity = 3;
+    g_scale = 1;
+    g_bias = 0.00015;
+    g_intensity = 10;
     const vec2 vec[4] = vec2[](vec2(1,0),vec2(-1,0),
-                            vec2(0,1),vec2(0,-1));
+                               vec2(0,1),vec2(0,-1));
     float depth = texture2D(u_texDepth, vs_texCoords).r;
     vec2 rand = normalize(texture2D(u_texNoise, vs_texCoords).rg * 2.0f - 1.0f );
-    //vec3 p = vec3( vs_texCoords.x * 2.0f - 1.0f, vs_texCoords.y * 2.0f - 1.0f, depth );
-    vec3 p = WSPositionFromDepth(vs_texCoords);
+    vec3 p = vec3( vs_texCoords.x * 2.0f - 1.0f, vs_texCoords.y * 2.0f - 1.0f, depth );
+    //vec3 p = WSPositionFromDepth(vs_texCoords);
     vec3 n = normalize(texture2D(u_texNormal,vs_texCoords).xyz * 2.0f - 1.0f);
 
 //    float3 p = getPosition(i.uv);
@@ -238,7 +239,7 @@ void main()
     {
       vec2 coord1 = reflect(vec[j],rand)*rad;
       vec2 coord2 = vec2(coord1.x*0.707 - coord1.y*0.707,
-                              coord1.x*0.707 + coord1.y*0.707);
+                         coord1.x*0.707 + coord1.y*0.707);
 
       ao += doAmbientOcclusion(vs_texCoords,coord1*0.25, p, n);
       ao += doAmbientOcclusion(vs_texCoords,coord2*0.5, p, n);
@@ -249,8 +250,8 @@ void main()
     out_fragColor = vec4(1-ao);
 }
 
-*/
 
+/*
 // get these data from the previous Shader Unit in the pipeline
 in vec2 vs_texCoords;
 
@@ -290,4 +291,4 @@ void main()
             color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
         }
     }
-}
+}*/

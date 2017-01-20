@@ -222,6 +222,7 @@ void TPGLWindow::updateMatrices()
         glm::mat4 mtxWorld          = glm::translate(glm::mat4(1.0f), m_vObjectTranslate);
         mtxWorld                    = glm::rotate(mtxWorld, m_vObjectEulerAngles.y, vUp );
         m_mtxCharacterWorld         = glm::rotate(mtxWorld, glm::radians(-90.0f), vRight);      // fixup for data loaded from OBJ with Z up
+      //  m_mtxCharacterWorld         = glm::mat4();      // fixup for data loaded from OBJ with Z up
     }
 
     // GROUND ------------------------------------------------------------------------------------------------

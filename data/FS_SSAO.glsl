@@ -217,7 +217,7 @@ void main()
 
     g_scale = 1;
     g_bias = 0.00015;
-    g_intensity = 10;
+    g_intensity = 15;
     const vec2 vec[4] = vec2[](vec2(1,0),vec2(-1,0),
                                vec2(0,1),vec2(0,-1));
     float depth = texture2D(u_texDepth, vs_texCoords).r;
@@ -247,7 +247,35 @@ void main()
       ao += doAmbientOcclusion(vs_texCoords,coord2, p, n);
     }
     ao/=iterations*4.0;
-    out_fragColor = vec4(1-ao);
+
+    vec4 sum = vec4(0);
+    vec2 texcoord = vs_texCoords;//vec2(gl_TexCoord[0]);
+    int j;
+    int i;
+    vec4 color;
+    for( i= -4 ;i < 4; i++)
+    {
+         for (j = -3; j < 3; j++)
+         {
+             sum += texture2D(u_texBlit, texcoord + vec2(j, i)*0.0004) * 0.25;
+         }
+    }
+        if (texture2D(u_texBlit, texcoord).r < 0.2)
+     {
+        color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
+     }
+     else
+     {
+         if (texture2D(u_texBlit, texcoord).r < 0.5)
+         {
+             color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
+         }
+         else
+         {
+             color = sum*sum*0.005 + texture2D(u_texBlit, texcoord);
+         }
+    }
+    out_fragColor = vec4(1-ao)*color;
 }
 
 
